@@ -1,0 +1,4 @@
+.*.sw[op]
+build
+__pycache__
+pytest-embedded
