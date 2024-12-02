@@ -4,22 +4,27 @@ ifeq ("$(wildcard $(PORT))","")
 endif
 
 
+BUILD_TYPE ?= debug
+IDF_FLAGS = \
+	-D BUILD_TYPE=$(BUILD_TYPE)
+
+
 all: build
 
 
 .PHONY: menu
 menu:
-	idf.py menuconfig
+	idf.py $(IDF_FLAGS) menuconfig
 
 
 .PHONY: build
 build:
-	idf.py build
+	idf.py $(IDF_FLAGS) build
 
 
 .PHONY: flash
 flash:
-	idf.py flash --port $(PORT)
+	idf.py $(IDF_FLAGS) flash --port $(PORT)
 
 
 .PHONY: screen
@@ -29,7 +34,7 @@ screen:
 
 .PHONY: test
 test:
-	pytest --target esp32 tests/
+	pytest --target esp32s3 tests/
 
 
 .PHONY: clean
