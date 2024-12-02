@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 
-if(BUILD_TYPE STREQUAL "debug")
+if(ESPIDF_BUILDTYPE STREQUAL "debug")
   add_definitions("-DDEBUG")
 endif()
 

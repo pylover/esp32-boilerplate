@@ -4,9 +4,9 @@ ifeq ("$(wildcard $(PORT))","")
 endif
 
 
-BUILD_TYPE ?= debug
+BUILDTYPE ?= debug
 IDF_FLAGS = \
-	-D BUILD_TYPE=$(BUILD_TYPE)
+	-D ESPIDF_BUILDTYPE=$(BUILDTYPE)
 
 
 all: build
