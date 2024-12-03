@@ -44,19 +44,15 @@ void
 app_main(void) {
     elog_verbosity = ELOG_DEBUG;
     elog_errfd = elog_outfd = _uart_init(UART_NUM_0);
+    PRINT(ELOG_LF);
+    INFO("ESP32 Boilerplate");
+    DEBUG("DEBUG Mode: ON");
 
     if (uaio_init(CONFIG_BOILERPLATE_TASKS_MAX)) {
         goto terminate;
     }
-
     DEBUG("uaio initialized successfully");
-//     PRINT(ELOG_LF);
-//     INFO("ESP32 Boilerplate");
-// #ifdef ESPIDF_DEBUG
-//     DEBUG("ESP32 DEBUG build #2");
-// #endif
-//     // printf("%s:%d\n", basename(__FILE__), __LINE__);
-//
+
 //     fdmon = caio_select_create(_caio, CONFIG_ORAS_FDMON_MAXFILES);
 //     if (fdmon == NULL) {
 //         goto terminate;
