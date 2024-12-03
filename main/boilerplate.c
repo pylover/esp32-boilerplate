@@ -6,6 +6,7 @@
 #include <driver/uart_vfs.h>
 #include <driver/uart.h>
 
+#include <uaio.h>
 #include <elog.h>
 
 
@@ -44,12 +45,44 @@ app_main(void) {
     elog_verbosity = ELOG_DEBUG;
     elog_errfd = elog_outfd = _uart_init(UART_NUM_0);
 
-    PRINT(ELOG_LF);
-    INFO("ESP32 Boilerplate");
-#ifdef ESPIDF_DEBUG
-    DEBUG("ESP32 DEBUG build #2");
-#endif
-    // printf("%s:%d\n", basename(__FILE__), __LINE__);
+    if (uaio_init(CONFIG_BOILERPLATE_TASKS_MAX)) {
+        goto terminate;
+    }
+
+    DEBUG("uaio initialized successfully");
+//     PRINT(ELOG_LF);
+//     INFO("ESP32 Boilerplate");
+// #ifdef ESPIDF_DEBUG
+//     DEBUG("ESP32 DEBUG build #2");
+// #endif
+//     // printf("%s:%d\n", basename(__FILE__), __LINE__);
+//
+//     fdmon = caio_select_create(_caio, CONFIG_ORAS_FDMON_MAXFILES);
+//     if (fdmon == NULL) {
+//         goto terminate;
+//     }
+//     sh.fdmon = (struct caio_fdmon*) fdmon;
+//     // _oras.fdmon = (struct caio_fdmon*) fdmon;
+//
+//     if (cuart_init(&sh.console, (struct caio_fdmon*)fdmon, UART_NUM_0, 43, 44,
+//                 0)) {
+//         ERROR("uart driver installation failed");
+//         goto terminate;
+//     }
+//
+//     if (cuart_init(&sh.debug, (struct caio_fdmon*)fdmon, UART_NUM_1, 6, 7,
+//                 0)) {
+//         ERROR("Cannot initialize UART1 for shell debug port.");
+//         goto terminate;
+//     }
+//     INFO("UART driver installed successfully.");
+//
+//     cshell_spawn(_caio, cshellA, &sh);
+//     // oras_spawn(_caio, orasA, &_oras);
+//     caio_loop(_caio);
+
+terminate:
+    uaio_destroy();
 
     INFO("Rebooting in 5 seconds...");
     vTaskDelay(5000 / portTICK_PERIOD_MS);

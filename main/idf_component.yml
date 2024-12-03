@@ -5,6 +5,8 @@ dependencies:
     version: ">=4.1.0"
   elog:
     git: git@github.com:pylover/elog.git
+  uaio:
+    path: ../../uaio
   # # Put list of dependencies here
   # # For components maintained by Espressif:
   # component: "~1.0.0"

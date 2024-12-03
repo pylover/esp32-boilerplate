@@ -1,0 +1,5 @@
+menu "boilerplate"
+	config BOILERPLATE_TASKS_MAX
+		int "uaio maximum allowed tasks."
+		default 8
+endmenu

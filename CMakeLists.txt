@@ -9,4 +9,5 @@ endif()
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(
   boilerplate
+  VERSION 0.1.0
 )
