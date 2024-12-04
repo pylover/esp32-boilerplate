@@ -1,6 +1,5 @@
 set(sources
-  "boilerplate.c"
-  "foo.c"
+  "main.c"
 )
 
 

@@ -8,7 +8,11 @@ dependencies:
   uaio:
     git: git@github.com:pylover/uaio.git
   euart:
-    git: git@github.com:pylover/euart.git
+    path: ../../euart
+    # git: git@github.com:pylover/euart.git
+  ush:
+    path: ../../ush
+    # git: git@github.com:pylover/ush.git
 
   # # Put list of dependencies here
   # # For components maintained by Espressif:
