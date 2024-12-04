@@ -6,7 +6,10 @@ dependencies:
   elog:
     git: git@github.com:pylover/elog.git
   uaio:
-    path: ../../uaio
+    git: git@github.com:pylover/uaio.git
+  euart:
+    git: git@github.com:pylover/euart.git
+
   # # Put list of dependencies here
   # # For components maintained by Espressif:
   # component: "~1.0.0"
@@ -15,6 +18,7 @@ dependencies:
   # username2/component2:
   #   version: "~1.0.0"
   #   # For transient dependencies `public` flag can be set.
-  #   # `public` flag doesn't have an effect dependencies of the `main` component.
+  #   # `public` flag doesn't have an effect dependencies of the `main` 
+  #   component.
   #   # All dependencies of `main` are public by default.
   #   public: true

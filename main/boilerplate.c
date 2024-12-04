@@ -9,6 +9,8 @@
 #include <uaio.h>
 #include <elog.h>
 
+#include "foo.h"
+
 
 static int
 _uart_init(int no) {
@@ -44,6 +46,10 @@ void
 app_main(void) {
     elog_verbosity = ELOG_DEBUG;
     elog_errfd = elog_outfd = _uart_init(UART_NUM_0);
+    struct foo foo = {
+        .interval = 1000000,
+    };
+
     PRINT(ELOG_LF);
     INFO("ESP32 Boilerplate");
     DEBUG("DEBUG Mode: ON");
@@ -53,13 +59,6 @@ app_main(void) {
     }
     DEBUG("uaio initialized successfully");
 
-//     fdmon = caio_select_create(_caio, CONFIG_ORAS_FDMON_MAXFILES);
-//     if (fdmon == NULL) {
-//         goto terminate;
-//     }
-//     sh.fdmon = (struct caio_fdmon*) fdmon;
-//     // _oras.fdmon = (struct caio_fdmon*) fdmon;
-//
 //     if (cuart_init(&sh.console, (struct caio_fdmon*)fdmon, UART_NUM_0, 43, 44,
 //                 0)) {
 //         ERROR("uart driver installation failed");
@@ -75,7 +74,9 @@ app_main(void) {
 //
 //     cshell_spawn(_caio, cshellA, &sh);
 //     // oras_spawn(_caio, orasA, &_oras);
-//     caio_loop(_caio);
+//
+    foo_spawn(fooA, &foo);
+    uaio_loop();
 
 terminate:
     uaio_destroy();
