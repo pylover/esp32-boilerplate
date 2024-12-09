@@ -40,7 +40,7 @@ app_main(void) {
     dprintf(ush.console.outfd, "\033[m"ELOG_LF);
 
     PRINT("\033[m"ELOG_LF);
-    INFO("ESP32 Boilerplate");
+    INFO("ESP32 Boilerplate!");
 
 #ifdef ESPIDF_DEBUG
     DEBUG("DEBUG Mode: ON");
