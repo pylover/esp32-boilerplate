@@ -2088,6 +2088,12 @@ CONFIG_BOILERPLATE_TASKS_MAX=8
 # end of boilerplate
 
 #
+# euart
+#
+CONFIG_EUART_BUFFSIZE=2048
+# end of euart
+
+#
 # uaio
 #
 CONFIG_UAIO_SEMAPHORE=y
@@ -2098,16 +2104,11 @@ CONFIG_UAIO_SELECT_MAXFILES=32
 # end of uaio
 
 #
-# euart
-#
-CONFIG_EUART_BUFFSIZE=2048
-# end of euart
-
-#
 # ush
 #
 CONFIG_USH_HISTORY_MASK=7
 CONFIG_USH_CMDLINE_MAX=256
+CONFIG_USH_VIMODE=y
 # end of ush
 # end of Component config
 

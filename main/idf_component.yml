@@ -6,7 +6,8 @@ dependencies:
   elog:
     git: git@github.com:pylover/elog.git
   uaio:
-    git: git@github.com:pylover/uaio.git
+    path: ../../uaio
+      # git: git@github.com:pylover/uaio.git
   euart:
     path: ../../euart
     # git: git@github.com:pylover/euart.git

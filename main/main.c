@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #include <freertos/FreeRTOS.h>
@@ -14,37 +15,45 @@
 #include "foo.h"
 
 
-struct ush ush = {
-
+struct euart debug = {
 };
 
+
+struct ush ush = {
+};
 
 
 void
 app_main(void) {
-    elog_verbosity = ELOG_DEBUG;
-    // elog_errfd = elog_outfd = _uart_init(UART_NUM_0);
-    PRINT(ELOG_LF);
-    INFO("ESP32 Boilerplate");
-    DEBUG("DEBUG Mode: ON");
-
-    if (euart_init(&ush.console, UART_NUM_0, 43, 44, EUIF_STDIO)) {
-        ERROR("Cannot init UART #0");
-        goto terminate;
-    }
-    INFO("UART #0 installed successfully.");
-
-    if (euart_init(&ush.debug, UART_NUM_1, 6, 7, 0)) {
+    if (euart_init(&debug, UART_NUM_1, 6, 7, 0)) {
         ERROR("Cannot init UART #1");
         goto terminate;
     }
+    elog_verbosity = ELOG_DEBUG;
+    elog_errfd = elog_outfd = debug.outfd;
     INFO("UART #1 installed successfully.");
+
+    if (euart_init(&ush.console, UART_NUM_0, 43, 44, EUIF_NONBLOCK)) {
+        ERROR("Cannot init UART #0");
+        goto terminate;
+    }
+    dprintf(ush.console.outfd, "\033[m"ELOG_LF);
+
+    PRINT("\033[m"ELOG_LF);
+    INFO("ESP32 Boilerplate");
+
+#ifdef ESPIDF_DEBUG
+    DEBUG("DEBUG Mode: ON");
+#endif
+
+    INFO("UART #0 installed successfully.");
 
     if (uaio_init(CONFIG_BOILERPLATE_TASKS_MAX)) {
         ERROR("Canno init uaio");
         goto terminate;
     }
     DEBUG("uaio initialized successfully");
+    fflush(stdout);
 
     ush_spawn(ushA, &ush);
     uaio_loop();
