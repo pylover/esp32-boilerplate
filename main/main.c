@@ -31,12 +31,13 @@ app_main(void) {
     }
     elog_verbosity = ELOG_DEBUG;
     elog_errfd = elog_outfd = debug.outfd;
-    INFO("UART #1 installed successfully.");
+    INFO("UART #1 initialized successfully.");
 
     if (euart_init(&ush.console, UART_NUM_0, 43, 44, EUIF_NONBLOCK)) {
         ERROR("Cannot init UART #0");
         goto terminate;
     }
+    INFO("UART #0 initialized successfully.");
     dprintf(ush.console.outfd, "\033[m"ELOG_LF);
 
     PRINT("\033[m"ELOG_LF);
@@ -45,8 +46,6 @@ app_main(void) {
 #ifdef ESPIDF_DEBUG
     DEBUG("DEBUG Mode: ON");
 #endif
-
-    INFO("UART #0 installed successfully.");
 
     if (uaio_init(CONFIG_BOILERPLATE_TASKS_MAX)) {
         ERROR("Canno init uaio");
