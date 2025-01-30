@@ -15,17 +15,22 @@
 #include "foo.h"
 
 
-struct euart debug = {
-};
-
-
-struct ush ush = {
-};
+struct euart debug;
+struct ush ush;
 
 
 void
 app_main(void) {
-    if (euart_init(&debug, UART_NUM_1, 6, 7, 0)) {
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity    = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+
+    if (euart_init(&debug, &uart_config, UART_NUM_1, 6, 7, 0)) {
         ERROR("Cannot init UART #1");
         goto terminate;
     }
@@ -33,7 +38,8 @@ app_main(void) {
     elog_errfd = elog_outfd = debug.outfd;
     INFO("UART #1 initialized successfully.");
 
-    if (euart_init(&ush.console, UART_NUM_0, 43, 44, EUIF_NONBLOCK)) {
+    if (euart_init(&ush.console, &uart_config, UART_NUM_0, 43, 44,
+                EUIF_NONBLOCK)) {
         ERROR("Cannot init UART #0");
         goto terminate;
     }

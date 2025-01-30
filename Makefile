@@ -1,6 +1,8 @@
 PORT = /dev/ttyACM0
+DEBUG_PORT = /dev/ttyUSB0
 ifeq ("$(wildcard $(PORT))","")
   PORT = /dev/ttyUSB0
+  DEBUG_PORT = /dev/ttyUSB1
 endif
 
 
@@ -71,6 +73,10 @@ screen:
 test:
 	pytest --target esp32s3 tests/
 
+
+.PHONY: debug
+debug:
+	screen $(DEBUG_PORT) 115200
 
 .PHONY: clean
 clean:
