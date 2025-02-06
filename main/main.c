@@ -15,7 +15,7 @@
 #include "foo.h"
 
 
-struct euart debug;
+struct euart_device debug;
 struct ush ush;
 
 
@@ -30,7 +30,7 @@ app_main(void) {
         .source_clk = UART_SCLK_DEFAULT,
     };
 
-    if (euart_init(&debug, &uart_config, UART_NUM_1, 6, 7, 0)) {
+    if (euart_device_init(&debug, &uart_config, UART_NUM_1, 6, 7, 0)) {
         ERROR("Cannot init UART #1");
         goto terminate;
     }
@@ -38,7 +38,7 @@ app_main(void) {
     elog_errfd = elog_outfd = debug.outfd;
     INFO("UART #1 initialized successfully.");
 
-    if (euart_init(&ush.console, &uart_config, UART_NUM_0, 43, 44,
+    if (euart_device_init(&ush.console, &uart_config, UART_NUM_0, 43, 44,
                 EUIF_NONBLOCK)) {
         ERROR("Cannot init UART #0");
         goto terminate;
