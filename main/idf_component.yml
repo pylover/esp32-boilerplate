@@ -3,11 +3,20 @@ dependencies:
   ## Required IDF version
   idf:
     version: ">=4.1.0"
+  uaio:
+    path: ../../uaio
+    # git: git@github.com:pylover/uaio.git
+  euart:
+    path: ../../euart
+    # git: git@github.com:pylover/euart.git
   elog:
-    git: git@github.com:pylover/elog.git
+    path: ../../elog
+    # git: git@github.com:pylover/elog.git
   ush:
     path: ../../ush
     # git: git@github.com:pylover/ush.git
+  ering:
+    path: ../../ering
 
   # # Put list of dependencies here
   # # For components maintained by Espressif:
