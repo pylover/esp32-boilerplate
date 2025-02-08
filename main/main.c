@@ -15,8 +15,9 @@
 #include "foo.h"
 
 
-struct euart_device debug;
-struct ush ush;
+static struct euart_device debug;
+static struct euart_device terminal;
+static struct ush *ush;
 
 
 void
@@ -38,13 +39,13 @@ app_main(void) {
     elog_errfd = elog_outfd = debug.outfd;
     INFO("UART #1 initialized successfully.");
 
-    if (euart_device_init(&ush.console, &uart_config, UART_NUM_0, 43, 44,
+    if (euart_device_init(&terminal, &uart_config, UART_NUM_0, 43, 44,
                 EUIF_NONBLOCK)) {
         ERROR("Cannot init UART #0");
         goto terminate;
     }
     INFO("UART #0 initialized successfully.");
-    dprintf(ush.console.outfd, "\033[m"ELOG_LF);
+    dprintf(terminal.outfd, "\033[m"ELOG_LF);
 
     PRINT("\033[m"ELOG_LF);
     INFO("ESP32 Boilerplate!");
@@ -53,6 +54,12 @@ app_main(void) {
     DEBUG("DEBUG Mode: ON");
 #endif
 
+    ush = ush_create(&terminal, NULL);
+    if (ush == NULL) {
+        ERROR("ush_create");
+        goto terminate;
+    }
+
     if (uaio_init(CONFIG_BOILERPLATE_TASKS_MAX)) {
         ERROR("Canno init uaio");
         goto terminate;
@@ -60,10 +67,11 @@ app_main(void) {
     DEBUG("uaio initialized successfully");
     fflush(stdout);
 
-    ush_spawn(ushA, &ush);
+    ush_spawn(ushA, ush);
     uaio_loop();
 
 terminate:
+    ush_destroy(ush);
     uaio_destroy();
 
     INFO("Rebooting in 5 seconds...");
