@@ -6,13 +6,12 @@
 #include <freertos/task.h>
 #include <driver/uart_vfs.h>
 #include <driver/uart.h>
+#include <esp_psram.h>
 
 #include <uaio.h>
 #include <elog.h>
 #include <euart.h>
 #include <ush.h>
-
-#include "foo.h"
 
 
 static struct euart_device debug;
@@ -46,6 +45,10 @@ app_main(void) {
     }
     INFO("UART #0 initialized successfully.");
     dprintf(terminal.outfd, "\033[m"ELOG_LF);
+
+    /* psram */
+    size_t psram_size = esp_psram_get_size();
+    INFO("PSRAM size: %d bytes", psram_size);
 
     PRINT("\033[m"ELOG_LF);
     INFO("ESP32 Boilerplate!");

@@ -6,6 +6,7 @@ set(sources
 idf_component_register(
   SRCS "${sources}"
   INCLUDE_DIRS "."
+  REQUIRES esp_mm esp_psram
 )
 
 
