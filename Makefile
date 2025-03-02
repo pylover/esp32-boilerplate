@@ -1,9 +1,8 @@
-PORT = /dev/ttyACM0
-DEBUG_PORT = /dev/ttyUSB0
-ifeq ("$(wildcard $(PORT))","")
-  PORT = /dev/ttyUSB0
-  DEBUG_PORT = /dev/ttyUSB1
-endif
+DEBUG_PORT = /dev/ttyACM0
+SHELL_PORT = /dev/ttyACM1
+# ifeq ("$(wildcard $(DEBUG_PORT))","") #   DEBUG_PORT = /dev/ttyUSB0
+#   SHELL_PORT = /dev/ttyACM1
+# endif
 
 
 HERE = $(shell readlink -f `dirname .`)
@@ -33,7 +32,7 @@ build:
 
 .PHONY: flash
 flash:
-	idf.py $(IDF_FLAGS) flash --port $(PORT)
+	idf.py $(IDF_FLAGS) flash --port $(DEBUG_PORT)
 
 
 ESPTOOL = /opt/esp32/pyenv/bin/esptool.py
@@ -64,19 +63,10 @@ rempte-flash:
 		"$(ESPTOOL) $(ESPTOOL_FLAGS) write_flash $(ESPTOOL_FLASHFLAGS)"
 
 
-.PHONY: screen
-screen:
-	screen $(PORT) 115200
-
-
 .PHONY: test
 test:
 	pytest --target esp32s3 tests/
 
-
-.PHONY: debug
-debug:
-	screen $(DEBUG_PORT) 115200
 
 .PHONY: clean
 clean:
@@ -87,3 +77,40 @@ clean:
 .PHONY: fullclean
 fullclean:
 	idf.py fullclean
+
+
+BIN = build/boilerplate.bin
+ELF = build/boilerplate.elf
+
+
+OPENOCD_FLAGS += \
+	-f board/esp32s3-builtin.cfg 
+GDB_FLAGS += \
+	-q \
+	-x gdbinit \
+	$(ELF)
+
+
+.PHONY: ocd
+ocd: 
+	openocd $(OPENOCD_FLAGS) -c "program_esp $(BIN) 0x10000 verify reset"
+
+
+.PHONY: gdb
+gdb: 
+	$(ESP32_TOOLCHAIN_PREFIX)gdb $(GDB_FLAGS)
+
+
+.PHONY: monitor
+monitor:
+	idf.py monitor
+
+
+.PHONY: debug
+debug:
+	idf.py openocd --openocd-commands "${OPENOCD_FLAGS}" gdb
+
+
+.PHONY: shell
+shell:
+	idf.py monitor -p $(SHELL_PORT)

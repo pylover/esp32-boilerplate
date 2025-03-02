@@ -7,6 +7,7 @@
 #include <driver/uart_vfs.h>
 #include <driver/uart.h>
 #include <esp_psram.h>
+#include <esp_vfs_dev.h>
 
 #include <uaio.h>
 #include <elog.h>
@@ -14,13 +15,17 @@
 #include <ush.h>
 
 
-static struct euart_device debug;
-static struct euart_device terminal;
+// static struct euart_device debug;
+static struct euart_device console;
 static struct ush *ush;
 
 
 void
 app_main(void) {
+    /* Register vfs uart driver: /dev/uartN */
+    uart_vfs_dev_register();
+    elog_verbosity = ELOG_DEBUG;
+
     uart_config_t uart_config = {
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
@@ -30,21 +35,13 @@ app_main(void) {
         .source_clk = UART_SCLK_DEFAULT,
     };
 
-    if (euart_device_init(&debug, &uart_config, UART_NUM_1, 6, 7, 0)) {
-        ERROR("Cannot init UART #1");
-        goto terminate;
-    }
-    elog_verbosity = ELOG_DEBUG;
-    elog_errfd = elog_outfd = debug.outfd;
-    INFO("UART #1 initialized successfully.");
-
-    if (euart_device_init(&terminal, &uart_config, UART_NUM_0, 43, 44,
+    if (euart_device_init(&console, &uart_config, UART_NUM_0, 43, 44,
                 EUIF_NONBLOCK)) {
         ERROR("Cannot init UART #0");
         goto terminate;
     }
     INFO("UART #0 initialized successfully.");
-    dprintf(terminal.outfd, "\033[m"ELOG_LF);
+    dprintf(console.outfd, "\033[m"ELOG_LF);
 
     /* psram */
     size_t psram_size = esp_psram_get_size();
@@ -57,7 +54,7 @@ app_main(void) {
     DEBUG("DEBUG Mode: ON");
 #endif
 
-    ush = ush_create(&terminal, NULL);
+    ush = ush_create(&console, NULL);
     if (ush == NULL) {
         ERROR("ush_create");
         goto terminate;

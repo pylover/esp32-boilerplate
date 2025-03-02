@@ -6,7 +6,8 @@ IDFDIR=${HOME}/esp/idf
 
 source /usr/local/lib/shellenv.sh
 shellenv_init esp32 $BASH_SOURCE
-# shellenv_set PROJECT_NAME FOO
+shellenv_set IDF_TARGET "esp32s3"
+shellenv_set ESP32_TOOLCHAIN_PREFIX "xtensa-${IDF_TARGET}-elf-"
 
 _PATHBACK=${PATH}
 source ${IDFDIR}/export.sh
