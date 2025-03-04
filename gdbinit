@@ -3,6 +3,5 @@ set remote hardware-watchpoint-limit 2
 mon reset halt
 maintenance flush register-cache
 thb app_main
-b term_prompt
-b term_append
+# b _escape
 c
