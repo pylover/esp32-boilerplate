@@ -20,6 +20,29 @@ static struct euart_device console;
 static struct ush *ush;
 
 
+ASYNC
+fooA(struct uaio_task *self, struct ush_process *p) {
+    UAIO_BEGIN(self);
+    ush_printf(p, "Foo bar baz\n");
+    UAIO_FINALLY(self);
+}
+
+
+ASYNC
+helloA(struct uaio_task *self, struct ush_process *p) {
+    UAIO_BEGIN(self);
+    ush_printf(p, "Hello World!\n");
+    UAIO_FINALLY(self);
+}
+
+
+struct ush_executable commands[] = {
+    {"hello", helloA},
+    {"foo", fooA},
+    {NULL}
+};
+
+
 void
 app_main(void) {
     /* Register vfs uart driver: /dev/uartN */
@@ -54,7 +77,7 @@ app_main(void) {
     DEBUG("DEBUG Mode: ON");
 #endif
 
-    ush = ush_create(&console, NULL);
+    ush = ush_create(&console, commands);
     if (ush == NULL) {
         ERROR("ush_create");
         goto terminate;

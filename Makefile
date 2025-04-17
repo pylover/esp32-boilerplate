@@ -1,5 +1,5 @@
-DEBUG_PORT = /dev/ttyACM0
-SHELL_PORT = /dev/ttyACM1
+DEBUG_PORT = /dev/ttyACM1
+SHELL_PORT = /dev/ttyACM0
 # ifeq ("$(wildcard $(DEBUG_PORT))","") #   DEBUG_PORT = /dev/ttyUSB0
 #   SHELL_PORT = /dev/ttyACM1
 # endif
