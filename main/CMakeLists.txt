@@ -1,4 +1,5 @@
 set(sources
+  "adc.c"
   "main.c"
 )
 
@@ -6,7 +7,7 @@ set(sources
 idf_component_register(
   SRCS "${sources}"
   INCLUDE_DIRS "."
-  REQUIRES esp_mm esp_psram vfs esp_driver_uart
+  REQUIRES esp_mm esp_psram vfs esp_driver_uart esp_adc
 )
 
 

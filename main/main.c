@@ -14,18 +14,12 @@
 #include <euart.h>
 #include <ush.h>
 
+#include "adc.h"
+
 
 // static struct euart_device debug;
 static struct euart_device console;
 static struct ush *ush;
-
-
-ASYNC
-fooA(struct uaio_task *self, struct ush_process *p) {
-    UAIO_BEGIN(self);
-    ush_printf(p, "Foo bar baz\n");
-    UAIO_FINALLY(self);
-}
 
 
 ASYNC
@@ -38,7 +32,7 @@ helloA(struct uaio_task *self, struct ush_process *p) {
 
 struct ush_executable commands[] = {
     {"hello", helloA},
-    {"foo", fooA},
+    {"adc", adcA},
     {NULL}
 };
 
