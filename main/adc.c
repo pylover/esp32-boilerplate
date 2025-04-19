@@ -158,7 +158,7 @@ adcA(struct uaio_task *self, struct ush_process *p) {
     }
     p->userptr = adc;
 
-    UAIO_SLEEP(self, 10000);
+    UAIO_SLEEP(self, 1000);
     printf("%d mV\n", adc_read(adc));
 
     UAIO_FINALLY(self);
