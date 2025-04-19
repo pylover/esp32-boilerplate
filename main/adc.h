@@ -14,6 +14,14 @@ struct adc {
 };
 
 
+struct adc *
+adc_create();
+
+
+int
+adc_destroy(struct adc *adc);
+
+
 ASYNC
 adcA(struct uaio_task *self, struct ush_process *p);
 
