@@ -1,2 +1,3 @@
+- disable wifi
 - readme
 - lint

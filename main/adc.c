@@ -1,18 +1,61 @@
+#include <esp_adc/adc_oneshot.h>
+#include <esp_adc/adc_cali.h>
+#include <esp_adc/adc_cali_scheme.h>
+
 #include <uaio.h>
 #include <ush.h>
 #include <elog.h>
-
-// #include "esp_adc/adc_cali.h"
-// #include "esp_adc/adc_cali_scheme.h"
+#include <earg.h>
 
 #include "adc.h"
 
 
-// TODO: disable wifi
-// TODO: configure adc1
+static int
+_parse_attenuation(const char *value) {
+    int a = atoi(value);
 
-// https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/esp_err.html#c.ESP_OK
-// #define ESP_ASSERT(c) if ((c != ESP_OK)) { UAIO_THROW(self) }
+    switch (a) {
+        case 2:
+            return ADC_ATTEN_DB_2_5;
+        case 6:
+            return ADC_ATTEN_DB_6;
+        case 12:
+            return ADC_ATTEN_DB_12;
+        default:
+            return ADC_ATTEN_DB_0;
+    }
+}
+
+
+static enum earg_eatstatus
+_eat(const struct earg_option *opt, const char *value, struct adc_conf *cfg) {
+    if (opt == NULL) {
+        /* Positional */
+        cfg->chan = atoi(value);
+        return EARG_EAT_OK; }
+
+    switch (opt->key) {
+        case 'a':
+            cfg->atten = _parse_attenuation(value);
+            break;
+        default:
+            return EARG_EAT_UNRECOGNIZED;
+    }
+
+    return EARG_EAT_OK;
+}
+
+
+/* create and configure a earg structure */
+static struct earg cli = {
+    .eat = (earg_eater_t)_eat,
+    .args = "channel",
+    .options = (const struct earg_option[]) {
+        {"attenuation", 'a', "NUM", 0,
+            "Attenuation, one of [0, 2, 6, 12]. default: 12"},
+        {NULL}  // vector termination
+    },
+};
 
 
 static int
@@ -77,7 +120,7 @@ _calibration_deinit(adc_cali_handle_t unit) {
 
 
 struct adc *
-adc_create(int unit, int atten, int chan) {
+adc_create(struct adc_conf *conf) {
     struct adc *adc = malloc(sizeof(struct adc));
     if (adc == NULL) {
         return NULL;
@@ -85,7 +128,7 @@ adc_create(int unit, int atten, int chan) {
 
     /* create and allocate a unit */
     adc_oneshot_unit_init_cfg_t uicfg = {
-        .unit_id = unit,
+        .unit_id = conf->unit,
         .ulp_mode = ADC_ULP_MODE_DISABLE,
     };
 
@@ -95,20 +138,19 @@ adc_create(int unit, int atten, int chan) {
 
     /* configure channel */
     adc_oneshot_chan_cfg_t chcfg = {
-        .atten = atten,
+        .atten = conf->atten,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    if (adc_oneshot_config_channel(adc->unit, chan, &chcfg) != ESP_OK) {
+    if (adc_oneshot_config_channel(adc->unit, conf->chan, &chcfg) != ESP_OK) {
         return NULL;
     }
 
     /* callibration */
-    if (_calibration_init(unit, chan, atten, &adc->cali)) {
+    if (_calibration_init(conf->unit, conf->chan, conf->atten, &adc->cali)) {
         return NULL;
     }
 
-    adc->chan = chan;
-    adc->atten = atten;
+    adc->chan = conf->chan;
     return adc;
 }
 
@@ -149,10 +191,27 @@ adc_read(struct adc *adc) {
 ASYNC
 adcA(struct uaio_task *self, struct ush_process *p) {
     struct adc *adc = (struct adc *)p->userptr;
+    struct adc_conf conf = {
+        .unit = ADC_UNIT_1,
+        .atten = ADC_ATTEN_DB_12,
+    };
     UAIO_BEGIN(self);
 
+    cli.userptr = &conf;
+    enum earg_status status = earg_parse(&cli, p->argc,
+            (const char **)p->argv, NULL);
+    DEBUG("[%d] atten: %d, chan: %d", conf.unit, conf.atten, conf.chan);
+    earg_dispose(&cli);
+
+    if (status < EARG_OK) {
+        UAIO_THROW(self);
+    }
+    if (status == EARG_OK_EXIT) {
+        UAIO_RETURN(self);
+    }
+
     /* create an adc instance */
-    adc = adc_create(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_CHANNEL_1);
+    adc = adc_create(&conf);
     if (adc == NULL) {
         UAIO_THROW(self);
     }

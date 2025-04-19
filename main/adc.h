@@ -4,20 +4,27 @@
 
 #include "esp_adc/adc_oneshot.h"
 
+
 #include <uaio.h>
 #include <ush.h>
 
 
-struct adc {
-    adc_oneshot_unit_handle_t unit;
-    adc_cali_handle_t cali;
+struct adc_conf {
+    int unit;
     int atten;
     int chan;
 };
 
 
+struct adc {
+    adc_oneshot_unit_handle_t unit;
+    adc_cali_handle_t cali;
+    int chan;
+};
+
+
 struct adc *
-adc_create(int unit, int atten, int chan);
+adc_create(struct adc_conf *adc);
 
 
 int

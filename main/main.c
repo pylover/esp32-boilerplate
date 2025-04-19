@@ -60,9 +60,6 @@ app_main(void) {
     INFO("UART #0 initialized successfully.");
     dprintf(console.outfd, "\033[m"ELOG_LF);
 
-    /* replace standard output files */
-    stderr = stdout = fdopen(console.outfd, "a");
-
     /* psram */
     size_t psram_size = esp_psram_get_size();
     INFO("PSRAM size: %d bytes", psram_size);
@@ -86,6 +83,9 @@ app_main(void) {
     }
     DEBUG("uaio initialized successfully");
     fflush(stdout);
+
+    /* replace standard output files */
+    stderr = stdout = fdopen(console.outfd, "a");
 
     ush_spawn(ushA, ush);
     uaio_loop();

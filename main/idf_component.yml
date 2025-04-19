@@ -17,6 +17,10 @@ dependencies:
     # git: git@github.com:pylover/ush.git
   ering:
     path: ../../ering
+    # git: git@github.com:pylover/ering.git
+  earg:
+    path: ../../earg
+    # git: git@github.com:pylover/earg.git
 
   # # Put list of dependencies here
   # # For components maintained by Espressif:
