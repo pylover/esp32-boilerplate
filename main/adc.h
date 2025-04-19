@@ -11,15 +11,21 @@
 struct adc {
     adc_oneshot_unit_handle_t unit;
     adc_cali_handle_t cali;
+    int atten;
+    int chan;
 };
 
 
 struct adc *
-adc_create();
+adc_create(int unit, int atten, int chan);
 
 
 int
 adc_destroy(struct adc *adc);
+
+
+int
+adc_read(struct adc *adc);
 
 
 ASYNC

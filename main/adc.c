@@ -8,11 +8,6 @@
 #include "adc.h"
 
 
-#define ADC_CHAN ADC_CHANNEL_2
-// #define ADC_ATTEN ADC_ATTEN_DB_0
-#define ADC_ATTEN ADC_ATTEN_DB_12
-
-
 // TODO: disable wifi
 // TODO: configure adc1
 
@@ -82,7 +77,7 @@ _calibration_deinit(adc_cali_handle_t unit) {
 
 
 struct adc *
-adc_create() {
+adc_create(int unit, int atten, int chan) {
     struct adc *adc = malloc(sizeof(struct adc));
     if (adc == NULL) {
         return NULL;
@@ -90,7 +85,7 @@ adc_create() {
 
     /* create and allocate a unit */
     adc_oneshot_unit_init_cfg_t uicfg = {
-        .unit_id = ADC_UNIT_1,
+        .unit_id = unit,
         .ulp_mode = ADC_ULP_MODE_DISABLE,
     };
 
@@ -100,18 +95,20 @@ adc_create() {
 
     /* configure channel */
     adc_oneshot_chan_cfg_t chcfg = {
-        .atten = ADC_ATTEN,
+        .atten = atten,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    if (adc_oneshot_config_channel(adc->unit, ADC_CHAN, &chcfg) != ESP_OK) {
+    if (adc_oneshot_config_channel(adc->unit, chan, &chcfg) != ESP_OK) {
         return NULL;
     }
 
     /* callibration */
-    if (_calibration_init(ADC_UNIT_1, ADC_CHAN, ADC_ATTEN, &adc->cali)) {
+    if (_calibration_init(unit, chan, atten, &adc->cali)) {
         return NULL;
     }
 
+    adc->chan = chan;
+    adc->atten = atten;
     return adc;
 }
 
@@ -131,31 +128,38 @@ adc_destroy(struct adc *adc) {
 }
 
 
-ASYNC
-adcA(struct uaio_task *self, struct ush_process *p) {
-    struct adc *adc = (struct adc*)p->userptr;
-    int v;
+int
+adc_read(struct adc *adc) {
     int raw;
-    UAIO_BEGIN(self);
+    int v;
 
-    /* create an adc instance */
-    if (adc == NULL) {
-        adc = adc_create();
-        if (adc == NULL) {
-            UAIO_THROW(self);
-        }
-        ush_printf(p, "ADC unit created successfully.\n");
-        p->userptr = adc;
-    }
-
-    UAIO_SLEEP(self, 1000);
-    if (adc_oneshot_read(adc->unit, ADC_CHAN, &raw) != ESP_OK) {
+    if (adc_oneshot_read(adc->unit, adc->chan, &raw) != ESP_OK) {
         ERROR("adc oneshot read");
+        return -1;
     }
     if (adc_cali_raw_to_voltage(adc->cali, raw, &v) != ESP_OK) {
         ERROR("adc cali raw to voltage");
+        return -1;
     }
-    ush_printf(p, "raw: %d -> %d mV\n", raw, v);
+
+    return v;
+}
+
+
+ASYNC
+adcA(struct uaio_task *self, struct ush_process *p) {
+    struct adc *adc = (struct adc *)p->userptr;
+    UAIO_BEGIN(self);
+
+    /* create an adc instance */
+    adc = adc_create(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_CHANNEL_1);
+    if (adc == NULL) {
+        UAIO_THROW(self);
+    }
+    p->userptr = adc;
+
+    UAIO_SLEEP(self, 10000);
+    printf("%d mV\n", adc_read(adc));
 
     UAIO_FINALLY(self);
     adc_destroy((struct adc*)p->userptr);
