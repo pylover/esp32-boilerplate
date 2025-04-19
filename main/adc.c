@@ -11,6 +11,19 @@
 
 
 static int
+_parse_unit(const char *value) {
+    int a = atoi(value);
+
+    switch (a) {
+        case 2:
+            return ADC_UNIT_2;
+        default:
+            return ADC_UNIT_1;
+    }
+}
+
+
+static int
 _parse_attenuation(const char *value) {
     int a = atoi(value);
 
@@ -38,6 +51,9 @@ _eat(const struct earg_option *opt, const char *value, struct adc_conf *cfg) {
         case 'a':
             cfg->atten = _parse_attenuation(value);
             break;
+        case 'u':
+            cfg->unit = _parse_unit(value);
+            break;
         default:
             return EARG_EAT_UNRECOGNIZED;
     }
@@ -53,6 +69,7 @@ static struct earg cli = {
     .options = (const struct earg_option[]) {
         {"attenuation", 'a', "NUM", 0,
             "Attenuation, one of [0, 2, 6, 12]. default: 12"},
+        {"unit", 'u', "UNIT", 0, "ADC Unit 1 or 2. default: 1"},
         {NULL}  // vector termination
     },
 };
