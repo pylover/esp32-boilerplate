@@ -15,6 +15,7 @@
 #include <ush.h>
 
 #include "adc.h"
+#include "gpio.h"
 
 
 // static struct euart_device debug;
@@ -33,6 +34,7 @@ helloA(struct uaio_task *self, struct ush_process *p) {
 struct ush_executable commands[] = {
     {"hello", helloA},
     {"adc", adcA},
+    {"gpio", gpioA},
     {NULL}
 };
 

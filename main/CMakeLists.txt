@@ -1,5 +1,6 @@
 set(sources
   "adc.c"
+  "gpio.c"
   "main.c"
 )
 
