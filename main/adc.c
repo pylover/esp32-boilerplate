@@ -217,7 +217,6 @@ adcA(struct uaio_task *self, struct ush_process *p) {
     cli.userptr = &conf;
     enum earg_status status = earg_parse(&cli, p->argc,
             (const char **)p->argv, NULL);
-    DEBUG("[%d] atten: %d, chan: %d", conf.unit, conf.atten, conf.chan);
     earg_dispose(&cli);
 
     if (status < EARG_OK) {

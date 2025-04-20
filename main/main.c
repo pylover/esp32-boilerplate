@@ -18,7 +18,6 @@
 #include "gpio.h"
 
 
-// static struct euart_device debug;
 static struct euart_device console;
 static struct ush *ush;
 
@@ -59,6 +58,7 @@ app_main(void) {
         ERROR("Cannot init UART #0");
         goto terminate;
     }
+    elog_outfd = console.outfd;
     INFO("UART #0 initialized successfully.");
     dprintf(console.outfd, "\033[m"ELOG_LF);
 
